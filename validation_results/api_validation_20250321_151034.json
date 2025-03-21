@@ -1,0 +1,69 @@
+{
+  "summary": {
+    "total": 13,
+    "passed": 5,
+    "failed": 7,
+    "skipped": 1,
+    "timestamp": "20250321_151034"
+  },
+  "results": {
+    "passed": [
+      {
+        "name": "Authentication",
+        "data": "True..."
+      },
+      {
+        "name": "Get Time",
+        "data": "{'time': '2025-03-21T15:10:23.398000-04:00'}..."
+      },
+      {
+        "name": "Rate Limiting",
+        "data": "True..."
+      },
+      {
+        "name": "Get Accounts",
+        "data": "{'accounts': [{'type': 'Margin', 'number': '27955569', 'status': 'Active', 'isPrimary': True, 'isBil..."
+      },
+      {
+        "name": "Get Account Balances",
+        "data": "{'perCurrencyBalances': [{'currency': 'CAD', 'cash': 1143.072, 'marketValue': 0, 'totalEquity': 1143..."
+      }
+    ],
+    "failed": [
+      {
+        "name": "Get Account Positions",
+        "error": "Questrade API Error 1017: Access token is invalid"
+      },
+      {
+        "name": "Get Account Activities",
+        "error": "Questrade API Error 1017: Access token is invalid"
+      },
+      {
+        "name": "Get Account Orders",
+        "error": "Questrade API Error 1017: Access token is invalid"
+      },
+      {
+        "name": "Get Account Executions",
+        "error": "Questrade API Error 1017: Access token is invalid"
+      },
+      {
+        "name": "Get Markets",
+        "error": "Questrade API Error 1017: Access token is invalid"
+      },
+      {
+        "name": "Search Symbols",
+        "error": "Questrade API Error 1017: Access token is invalid"
+      },
+      {
+        "name": "Get Symbols by Names",
+        "error": "Questrade API Error 1017: Access token is invalid"
+      }
+    ],
+    "skipped": [
+      {
+        "name": "Get Strategy Quotes",
+        "reason": "Requires a strategy variant ID which cannot be obtained automatically"
+      }
+    ]
+  }
+}

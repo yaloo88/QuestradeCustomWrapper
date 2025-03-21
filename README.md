@@ -1,37 +1,45 @@
 # Questrade Custom API Wrapper
 
+![Python](https://img.shields.io/badge/Python-3.6%2B-blue)
+![License](https://img.shields.io/badge/License-MIT-green)
+![Status](https://img.shields.io/badge/Status-In%20Development-yellow)
+
 A Python wrapper for the Questrade API that simplifies authentication and provides easy-to-use methods for accessing market data, account information, and performing trading operations with the Questrade platform.
 
-## Table of Contents
+<p align="center">
+  <img src="https://upload.wikimedia.org/wikipedia/en/thumb/7/7e/Questrade_logo.svg/320px-Questrade_logo.svg.png" alt="Questrade Logo" width="200"/>
+</p>
 
-- [Overview](#overview)
-- [Installation](#installation)
-- [Authentication](#authentication)
-- [Usage](#usage)
-- [API Reference](#api-reference)
-- [Error Handling](#error-handling)
-- [Rate Limiting](#rate-limiting)
-- [Enumerations](#enumerations)
-- [Examples](#examples)
-- [Project Structure](#project-structure)
-- [Contributing](#contributing)
-- [License](#license)
+## 📋 Table of Contents
 
-## Overview
+- [Overview](#-overview)
+- [Installation](#-installation)
+- [Authentication](#-authentication)
+- [Usage](#-usage)
+- [API Reference](#-api-reference)
+- [Error Handling](#-error-handling)
+- [Rate Limiting](#-rate-limiting)
+- [Enumerations](#-enumerations)
+- [Examples](#-examples)
+- [Project Structure](#-project-structure)
+- [Contributing](#-contributing)
+- [License](#-license)
+
+## 🔍 Overview
 
 This project provides a convenient Python wrapper around the Questrade REST API. It handles authentication, token refresh, and provides intuitive methods for querying account information, market data, and executing trades.
 
-Features:
-- OAuth2 authentication with automatic token refresh
-- Methods for accessing account information (balances, positions, orders, executions)
-- Market data access (quotes, candles, symbols, options)
-- Built-in rate limiting to prevent API limit errors
-- Structured error handling with informative exceptions
-- Type-safe enumerations for various API parameters
-- Well-documented API with type hints
-- Example scripts for common use cases
+### Features:
+- ✅ OAuth2 authentication with automatic token refresh
+- ✅ Methods for accessing account information (balances, positions, orders, executions)
+- ✅ Market data access (quotes, candles, symbols, options)
+- ✅ Built-in rate limiting to prevent API limit errors
+- ✅ Structured error handling with informative exceptions
+- ✅ Type-safe enumerations for various API parameters
+- ✅ Well-documented API with type hints
+- ✅ Example scripts for common use cases
 
-## Installation
+## 💾 Installation
 
 Clone the repository:
 
@@ -45,7 +53,7 @@ The wrapper requires Python 3.6+ and the following dependencies:
 - pathlib
 - typing
 
-## Authentication
+## 🔐 Authentication
 
 To use the Questrade API, you need a refresh token from Questrade. You can obtain one by:
 
@@ -69,7 +77,7 @@ api = QuestradeAPI(token_path="/path/to/your/token.json")
 
 If no refresh token is available, the wrapper will prompt you to enter one.
 
-## Usage
+## 🚀 Usage
 
 Here's a quick example of how to use the wrapper:
 
@@ -95,34 +103,38 @@ candles = questrade.get_candles(
 )
 ```
 
-## API Reference
+## 📚 API Reference
 
 For a complete list of available methods and parameters, see the [API Documentation](./QuestradeAPI/DOCUMENTATION.md).
 
 ### Account Methods
 
-- `get_accounts()`: Get all accounts associated with the user
-- `get_account_positions(account_id)`: Get positions for a specific account
-- `get_account_balances(account_id)`: Get balances for a specific account
-- `get_account_executions(account_id, start_time, end_time)`: Get executions for a specific account
-- `get_account_orders(account_id, start_time, end_time, state)`: Get orders for a specific account
-- `get_account_activities(account_id, start_time, end_time)`: Get account activities
+| Method | Description |
+|--------|-------------|
+| `get_accounts()` | Get all accounts associated with the user |
+| `get_account_positions(account_id)` | Get positions for a specific account |
+| `get_account_balances(account_id)` | Get balances for a specific account |
+| `get_account_executions(account_id, start_time, end_time)` | Get executions for a specific account |
+| `get_account_orders(account_id, start_time, end_time, state)` | Get orders for a specific account |
+| `get_account_activities(account_id, start_time, end_time)` | Get account activities |
 
 ### Market Data Methods
 
-- `get_symbols(symbols)`: Get symbol data for a list of symbols
-- `get_symbol(symbol_id)`: Get detailed information for a specific symbol
-- `search_symbols(prefix, offset)`: Search for symbols by prefix
-- `get_symbol_options(symbol_id)`: Get options for a symbol
-- `get_markets()`: Get information about supported markets
-- `get_quotes(symbol_ids)`: Get quotes for a list of symbols
-- `get_quote(symbol_id)`: Get quote for a single symbol
-- `get_candles(symbol_id, start_time, end_time, interval)`: Get historical candles for a symbol
-- `get_option_quotes(option_ids)`: Get quotes for option symbols
-- `get_strategy_quotes(variant_id)`: Get quotes for strategy variants
-- `get_time()`: Get current server time
+| Method | Description |
+|--------|-------------|
+| `get_symbols(symbols)` | Get symbol data for a list of symbols |
+| `get_symbol(symbol_id)` | Get detailed information for a specific symbol |
+| `search_symbols(prefix, offset)` | Search for symbols by prefix |
+| `get_symbol_options(symbol_id)` | Get options for a symbol |
+| `get_markets()` | Get information about supported markets |
+| `get_quotes(symbol_ids)` | Get quotes for a list of symbols |
+| `get_quote(symbol_id)` | Get quote for a single symbol |
+| `get_candles(symbol_id, start_time, end_time, interval)` | Get historical candles for a symbol |
+| `get_option_quotes(option_ids)` | Get quotes for option symbols |
+| `get_strategy_quotes(variant_id)` | Get quotes for strategy variants |
+| `get_time()` | Get current server time |
 
-## Error Handling
+## ⚠️ Error Handling
 
 The wrapper provides structured error handling through exception classes that match the Questrade API error format:
 
@@ -167,7 +179,7 @@ except QuestradeOrderError as e:
 
 The wrapper automatically handles authentication errors and will attempt to re-authenticate if needed.
 
-## Rate Limiting
+## ⏱️ Rate Limiting
 
 The wrapper includes built-in support for rate limiting to prevent hitting Questrade API rate limits. It handles:
 
@@ -215,7 +227,7 @@ To disable rate limiting (not recommended for production):
 api = QuestradeAPI(enforce_rate_limit=False)
 ```
 
-## Enumerations
+## 🔢 Enumerations
 
 The wrapper provides Python enumerations for the various enum types used in the Questrade API. Import them from `QuestradeAPI.enums`:
 
@@ -240,7 +252,7 @@ Available enumerations include:
 
 For the complete list, see the [API Documentation](./QuestradeAPI/DOCUMENTATION.md#enumerations).
 
-## Examples
+## 📝 Examples
 
 The repository includes example scripts in the `scripts` directory that demonstrate common use cases:
 
@@ -254,7 +266,7 @@ To run an example:
 python -m scripts.api_examples
 ```
 
-## Project Structure
+## 📂 Project Structure
 
 ```
 QuestradeCustomAPIWrapper/
@@ -274,11 +286,10 @@ QuestradeCustomAPIWrapper/
 └── README.md                # This file
 ```
 
-## Contributing
+## 👥 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-## License
+## 📄 License
 
-This project is licensed under the MIT License - see the LICENSE file for details. #   Q u e s t r a d e C u s t o m W r a p p e r  
- 
+This project is licensed under the MIT License - see the LICENSE file for details.
