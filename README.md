@@ -20,7 +20,7 @@ This method makes the API callable from any Python script on your system:
 ```bash
 # Clone the repository
 git clone https://github.com/yaloo88/QuestradeCustomWrapper
-cd QuestradeCustomAPIWrapper
+cd QuestradeCustomWrapper
 
 # Install as a package in development mode
 pip install -e .
@@ -40,7 +40,7 @@ api = QuestradeAPI()
 ```bash
 # Clone the repository
 git clone https://github.com/yaloo88/QuestradeCustomWrapper
-cd QuestradeCustomAPIWrapper
+cd QuestradeCustomWrapper
 
 # Install dependencies
 pip install -r requirements.txt
@@ -174,7 +174,7 @@ The easiest and recommended approach is to install the wrapper as a Python packa
 
 ```bash
 # After cloning
-cd QuestradeCustomAPIWrapper
+cd QuestradeCustomWrapper
 pip install -e .
 ```
 
