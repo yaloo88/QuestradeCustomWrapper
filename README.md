@@ -30,7 +30,7 @@ After installation, you can import the package from any Python script:
 
 ```python
 # From any script on your system
-from questrade_custom_api import QuestradeAPI
+from QuestradeAPI import QuestradeAPI
 
 api = QuestradeAPI()
 ```
