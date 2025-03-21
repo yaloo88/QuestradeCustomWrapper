@@ -1,6 +1,6 @@
 # Questrade Custom API Wrapper
 
-A comprehensive Python wrapper for the Questrade API, providing easy access to account information, market data, and trading functionality.
+A comprehensive Python wrapper for the Questrade API, providing easy access to account information and market data.
 
 ## Features
 
