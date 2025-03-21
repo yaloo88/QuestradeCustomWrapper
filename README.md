@@ -15,7 +15,7 @@ A comprehensive Python wrapper for the Questrade API, providing easy access to a
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/QuestradeCustomAPIWrapper.git
+git clone https://github.com/yaloo88/QuestradeCustomAPIWrapper.git
 cd QuestradeCustomAPIWrapper
 
 # Install dependencies
