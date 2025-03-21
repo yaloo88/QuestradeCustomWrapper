@@ -224,7 +224,7 @@ pip install -e .
 Then in any script:
 
 ```python
-from questrade_custom_api import QuestradeAPI
+from QuestradeAPI import QuestradeAPI
 
 api = QuestradeAPI()
 # Use the API...
