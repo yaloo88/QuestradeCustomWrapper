@@ -145,49 +145,6 @@ api = QuestradeAPI(enforce_rate_limit=False)
 
 Check the [notebooks/Examples.ipynb](notebooks/Examples.ipynb) for more usage examples.
 
-## Trading Functionality
-
-The wrapper supports placing and managing orders:
-
-```python
-# Place a market order
-order_response = api.place_order(
-    account_id="12345678",
-    symbol_id="9001",  # AAPL symbol ID
-    quantity=10,
-    order_type="Market",
-    action="Buy",
-    time_in_force="Day"
-)
-
-# Place a limit order
-order_response = api.place_order(
-    account_id="12345678",
-    symbol_id="9001",  # AAPL symbol ID
-    quantity=10,
-    order_type="Limit",
-    limit_price=150.00,
-    action="Buy",
-    time_in_force="Day"
-)
-
-# Get order status
-order_id = order_response['orders'][0]['id']
-order_status = api.get_order(account_id="12345678", order_id=order_id)
-
-# Cancel an order
-cancel_response = api.cancel_order(account_id="12345678", order_id=order_id)
-```
-
-## Automated Git Tools
-
-This repository includes scripts to help with Git operations:
-
-- `commit.sh` - Bash script for Unix/Linux/macOS
-- `Commit.ps1` - PowerShell script for Windows
-
-These scripts provide an interactive way to stage, commit, and push changes.
-
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
