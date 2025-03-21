@@ -1,132 +1,177 @@
 # Questrade Custom API Wrapper
 
-![Python](https://img.shields.io/badge/Python-3.6%2B-blue)
-![License](https://img.shields.io/badge/License-MIT-green)
-![Status](https://img.shields.io/badge/Status-In%20Development-yellow)
+A comprehensive Python wrapper for the Questrade API, providing easy access to account information, market data, and trading functionality.
 
-A Python wrapper for the Questrade API that simplifies authentication and provides easy-to-use methods for accessing market data, account information, and performing trading operations with the Questrade platform.
+## Features
 
-<p align="center">
-  <img src="https://upload.wikimedia.org/wikipedia/en/thumb/7/7e/Questrade_logo.svg/320px-Questrade_logo.svg.png" alt="Questrade Logo" width="200"/>
-</p>
+- **Simple Authentication**: Handles OAuth2 authentication flow with automatic token refresh
+- **Comprehensive API Coverage**: Access to all major Questrade API endpoints
+- **Rate Limiting**: Built-in rate limit handling to prevent API throttling
+- **Error Handling**: Structured exception handling with detailed error information
+- **Type Annotations**: Full Python type hints for better IDE integration
+- **Cross-Platform**: Works on Windows, macOS, and Linux
 
-## 📋 Table of Contents
-
-- [Overview](#-overview)
-- [Installation](#-installation)
-- [Authentication](#-authentication)
-- [Usage](#-usage)
-- [API Reference](#-api-reference)
-- [Error Handling](#-error-handling)
-- [Rate Limiting](#-rate-limiting)
-- [Enumerations](#-enumerations)
-- [Examples](#-examples)
-- [Project Structure](#-project-structure)
-- [Development Tools](#-development-tools)
-- [Contributing](#-contributing)
-- [License](#-license)
-
-## 🔍 Overview
-
-This project provides a convenient Python wrapper around the Questrade REST API. It handles authentication, token refresh, and provides intuitive methods for querying account information, market data, and executing trades.
-
-### Features:
-- ✅ OAuth2 authentication with automatic token refresh
-- ✅ Methods for accessing account information (balances, positions, orders, executions)
-- ✅ Market data access (quotes, candles, symbols, options)
-- ✅ Built-in rate limiting to prevent API limit errors
-- ✅ Structured error handling with informative exceptions
-- ✅ Type-safe enumerations for various API parameters
-- ✅ Well-documented API with type hints
-- ✅ Example scripts for common use cases
-
-## 💾 Installation
-
-Clone the repository:
+## Installation
 
 ```bash
+# Clone the repository
 git clone https://github.com/yourusername/QuestradeCustomAPIWrapper.git
 cd QuestradeCustomAPIWrapper
+
+# Install dependencies
+pip install -r requirements.txt
 ```
 
-The wrapper requires Python 3.6+ and the following dependencies:
-- requests
-- pathlib
-- typing
-
-## 🔐 Authentication
-
-To use the Questrade API, you need a refresh token from Questrade. You can obtain one by:
-
-1. Log in to your Questrade account at https://login.questrade.com
-2. Go to App Hub > Register a personal app
-3. Get your refresh token
-
-The wrapper can be initialized in several ways:
-
-```python
-# Method 1: Provide the refresh token directly
-api = QuestradeAPI(refresh_token="your_refresh_token")
-
-# Method 2: Store the token in a file (default: secrets/questrade_token.json)
-# The wrapper will read from this file automatically
-api = QuestradeAPI()
-
-# Method 3: Specify a custom path for the token file
-api = QuestradeAPI(token_path="/path/to/your/token.json")
-```
-
-If no refresh token is available, the wrapper will prompt you to enter one.
-
-## 🚀 Usage
-
-Here's a quick example of how to use the wrapper:
+## Quick Start
 
 ```python
 from QuestradeAPI.CustomWrapper import QuestradeAPI
 
-# Initialize the API
-questrade = QuestradeAPI()
+# Initialize with a refresh token
+api = QuestradeAPI(refresh_token="your_refresh_token")
 
-# Get all accounts
-accounts = questrade.get_accounts()
+# Or use a saved token file (default location or custom)
+api = QuestradeAPI()  # Uses default token path
+api = QuestradeAPI(token_path="/path/to/token.json")
 
-# Get balances for the first account
+# Get account information
+accounts = api.get_accounts()
 account_id = accounts['accounts'][0]['number']
-balances = questrade.get_account_balances(account_id)
+
+# Get positions for an account
+positions = api.get_account_positions(account_id)
+for position in positions['positions']:
+    print(f"{position['symbol']}: {position['openQuantity']} shares at ${position['currentPrice']}")
 
 # Get market data
-candles = questrade.get_candles(
-    symbol_id="9001", 
-    start_time="2023-01-01T00:00:00-05:00",
-    end_time="2023-01-31T00:00:00-05:00", 
+symbol_info = api.search_symbols("AAPL")
+symbol_id = symbol_info['symbols'][0]['symbolId']
+
+# Get historical data
+import datetime
+from datetime import timedelta
+
+end_time = datetime.datetime.now()
+start_time = end_time - timedelta(days=30)
+
+# Format dates in ISO 8601 format with timezone
+start_time_str = start_time.strftime("%Y-%m-%dT%H:%M:%S.000000-05:00")
+end_time_str = end_time.strftime("%Y-%m-%dT%H:%M:%S.000000-05:00")
+
+candles = api.get_candles(
+    symbol_id=symbol_id,
+    start_time=start_time_str,
+    end_time=end_time_str,
     interval="OneDay"
 )
 ```
 
-## 📚 API Reference
+## Documentation
 
-For a complete list of available methods and parameters, see the [API Documentation](./QuestradeAPI/DOCUMENTATION.md).
+For detailed API documentation, see the [DOCUMENTATION.md](QuestradeAPI/DOCUMENTATION.md) file.
 
-### Account Methods
+## Error Handling
 
-| Method | Description |
-|--------|-------------|
-| `get_accounts()` | Get all accounts associated with the user |
-| `get_account_positions(account_id)` | Get positions for a specific account |
-| `get_account_balances(account_id)` | Get balances for a specific account |
-| `get_account_executions(account_id, start_time, end_time)` | Get executions for a specific account |
-| `get_account_orders(account_id, start_time, end_time, state)` | Get orders for a specific account |
-| `get_account_activities(account_id, start_time, end_time)` | Get account activities |
+The wrapper provides structured error handling through exception classes:
 
-### Market Data Methods
+```python
+from QuestradeAPI.CustomWrapper import (
+    QuestradeAPI, 
+    QuestradeAPIError, 
+    QuestradeGeneralError, 
+    QuestradeOrderError,
+    QuestradeRateLimitError
+)
 
-| Method | Description |
-|--------|-------------|
-| `get_symbols(symbols)` | Get symbol data for a list of symbols |
-| `get_symbol(symbol_id)` | Get detailed information for a specific symbol |
-| `search_symbols(prefix, offset)` | Search for symbols by prefix |
-| `get_symbol_options(symbol_id)` | Get options for a symbol |
-| `get_markets()` | Get information about supported markets |
-| `get_quotes(symbol_ids)` | Get quotes for a list of symbols |
-| `
+try:
+    api = QuestradeAPI()
+    data = api.get_account_positions("12345678")
+except QuestradeRateLimitError as e:
+    print(f"Rate limit error: {e.code} - {e.message}")
+    print(f"Retry after: {e.retry_after} seconds")
+except QuestradeOrderError as e:
+    print(f"Order error: {e.code} - {e.message}")
+    print(f"Order ID: {e.order_id}")
+except QuestradeGeneralError as e:
+    print(f"General error: {e.code} - {e.message}")
+except QuestradeAPIError as e:
+    print(f"API error: {e.code} - {e.message}")
+```
+
+## Rate Limiting
+
+The wrapper includes built-in rate limiting to prevent hitting Questrade API limits:
+
+```python
+# Enable rate limiting with custom retry attempts
+api = QuestradeAPI(enforce_rate_limit=True, max_retries=5)
+
+# Disable rate limiting (not recommended for production)
+api = QuestradeAPI(enforce_rate_limit=False)
+```
+
+## Examples
+
+Check the [notebooks/Examples.ipynb](notebooks/Examples.ipynb) for more usage examples.
+
+## Trading Functionality
+
+The wrapper supports placing and managing orders:
+
+```python
+# Place a market order
+order_response = api.place_order(
+    account_id="12345678",
+    symbol_id="9001",  # AAPL symbol ID
+    quantity=10,
+    order_type="Market",
+    action="Buy",
+    time_in_force="Day"
+)
+
+# Place a limit order
+order_response = api.place_order(
+    account_id="12345678",
+    symbol_id="9001",  # AAPL symbol ID
+    quantity=10,
+    order_type="Limit",
+    limit_price=150.00,
+    action="Buy",
+    time_in_force="Day"
+)
+
+# Get order status
+order_id = order_response['orders'][0]['id']
+order_status = api.get_order(account_id="12345678", order_id=order_id)
+
+# Cancel an order
+cancel_response = api.cancel_order(account_id="12345678", order_id=order_id)
+```
+
+## Automated Git Tools
+
+This repository includes scripts to help with Git operations:
+
+- `commit.sh` - Bash script for Unix/Linux/macOS
+- `Commit.ps1` - PowerShell script for Windows
+
+These scripts provide an interactive way to stage, commit, and push changes.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## Acknowledgements
+
+- [Questrade API Documentation](https://www.questrade.com/api/documentation/getting-started)
+- Thanks to all contributors who have helped improve this wrapper 
