@@ -56,7 +56,7 @@ from QuestradeAPI.CustomWrapper import QuestradeAPI
 ## Quick Start
 
 ```python
-from questrade_custom_api import QuestradeAPI
+from QuestradeAPI import QuestradeAPI
 
 # Initialize with a refresh token
 api = QuestradeAPI(refresh_token="your_refresh_token")
