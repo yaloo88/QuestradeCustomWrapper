@@ -13,6 +13,30 @@ A comprehensive Python wrapper for the Questrade API, providing easy access to a
 
 ## Installation
 
+### Method 1: Clone and Install as Package (Recommended)
+
+This method makes the API callable from any Python script on your system:
+
+```bash
+# Clone the repository
+git clone https://github.com/yaloo88/QuestradeCustomAPIWrapper.git
+cd QuestradeCustomAPIWrapper
+
+# Install as a package in development mode
+pip install -e .
+```
+
+After installation, you can import the package from any Python script:
+
+```python
+# From any script on your system
+from questrade_custom_api import QuestradeAPI
+
+api = QuestradeAPI()
+```
+
+### Method 2: Clone and Install Dependencies Only
+
 ```bash
 # Clone the repository
 git clone https://github.com/yaloo88/QuestradeCustomAPIWrapper.git
@@ -22,10 +46,17 @@ cd QuestradeCustomAPIWrapper
 pip install -r requirements.txt
 ```
 
+When using this method, you'll need to import directly from the project:
+
+```python
+# Need to import from specific path
+from QuestradeAPI.CustomWrapper import QuestradeAPI
+```
+
 ## Quick Start
 
 ```python
-from QuestradeAPI.CustomWrapper import QuestradeAPI
+from questrade_custom_api import QuestradeAPI
 
 # Initialize with a refresh token
 api = QuestradeAPI(refresh_token="your_refresh_token")
@@ -175,3 +206,71 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 - [Questrade API Documentation](https://www.questrade.com/api/documentation/getting-started)
 - Thanks to all contributors who have helped improve this wrapper 
+
+## Using the API from Any Script
+
+There are several ways to use the Questrade Custom API Wrapper from any script after cloning the repository:
+
+### 1. Install as a Package (Recommended)
+
+The easiest and recommended approach is to install the wrapper as a Python package:
+
+```bash
+# After cloning
+cd QuestradeCustomAPIWrapper
+pip install -e .
+```
+
+Then in any script:
+
+```python
+from questrade_custom_api import QuestradeAPI
+
+api = QuestradeAPI()
+# Use the API...
+```
+
+### 2. Add to Python Path
+
+If you prefer not to install the package, you can add the repository to your Python path:
+
+```python
+import sys
+import os
+from pathlib import Path
+
+# Add the repository root to Python path
+repo_path = Path('/path/to/QuestradeCustomAPIWrapper')  # Change this to your actual path
+sys.path.append(str(repo_path))
+
+# Now import the API
+from QuestradeAPI.CustomWrapper import QuestradeAPI
+
+api = QuestradeAPI()
+# Use the API...
+```
+
+### 3. Set Environment Variable
+
+You could also set the PYTHONPATH environment variable:
+
+```bash
+# In bash/sh
+export PYTHONPATH=$PYTHONPATH:/path/to/QuestradeCustomAPIWrapper
+
+# In PowerShell
+$env:PYTHONPATH += ";C:\path\to\QuestradeCustomAPIWrapper"
+```
+
+Then in your script:
+
+```python
+from QuestradeAPI.CustomWrapper import QuestradeAPI
+
+api = QuestradeAPI()
+# Use the API...
+```
+
+### 4. Use the Examples
+
+Check out the examples in the `/examples` directory for sample scripts that show how to use the API. 

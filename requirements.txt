@@ -1,0 +1,2 @@
+requests>=2.25.0
+typing; python_version<"3.5" 
