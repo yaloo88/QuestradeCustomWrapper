@@ -144,6 +144,19 @@ Data is stored in SQLite databases in the `data` directory of your project:
 - `symbols.db`: Cached symbol information
 - `market_data.db`: Historical candle data
 
+## Recent Bugfixes
+
+Two important fixes have been implemented for the Chronos data caching component:
+
+1. **Database Schema Fix**: Added missing `interval` column to the `candles` table in `market_data.db` and updated the primary key to support multiple intervals.
+2. **Datetime Handling Fix**: Resolved timezone comparison issues in the `get_candles` method.
+
+These fixes ensure that:
+- Different time intervals (e.g., OneMinute, OneDay) for the same symbol and timestamp can coexist in the database
+- Datetime comparisons work correctly across timezone-aware and timezone-naive datetime objects
+
+For detailed information about these fixes, see the scripts and documentation in the `examples/bugfixes` directory.
+
 ## Documentation
 
 For detailed API documentation, see the [DOCUMENTATION.md](QuestradeAPI/DOCUMENTATION.md) file.
