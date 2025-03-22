@@ -168,8 +168,57 @@ class Chronos:
             print(f"Unexpected error: {e}")
             return []
     
-    def bulk_insert_symbols(self, symbol_data_list):
-        """Insert multiple symbols at once for better performance"""
+    def bulk_insert_symbols(self, symbols, auto_fetch=True):
+        """
+        Insert multiple symbols at once for better performance.
+        
+        Args:
+            symbols: Can be either:
+                - A list of symbol dictionaries in API format
+                - A list of symbol strings (e.g., ["AAPL", "MSFT", "GOOGL"])
+                - A comma-separated string of symbols (e.g., "AAPL,MSFT,GOOGL")
+            auto_fetch (bool): If True and symbols is not in API format, fetch symbol data from API
+        
+        Returns:
+            int: Number of symbols successfully inserted
+        """
+        if not self.api and auto_fetch:
+            raise ValueError("API instance is required to fetch symbol data")
+        
+        symbol_data_list = []
+        
+        # Convert input to a list of symbol strings if needed
+        if isinstance(symbols, str):
+            symbol_list = [s.strip() for s in symbols.split(',')]
+        elif isinstance(symbols, list) and all(isinstance(s, str) for s in symbols):
+            # List of strings
+            symbol_list = symbols
+        elif isinstance(symbols, list) and all(isinstance(s, dict) for s in symbols):
+            # Already in expected format
+            symbol_data_list = symbols
+            auto_fetch = False
+        else:
+            raise ValueError("Symbols must be a list of dictionaries, a list of strings, or a comma-separated string")
+        
+        # If auto_fetch is True, get complete symbol information
+        if auto_fetch:
+            symbol_data_list = []
+            for symbol in symbol_list:
+                try:
+                    symbol_info = self.api.search_symbols(symbol)
+                    if 'symbols' in symbol_info and symbol_info['symbols']:
+                        symbol_data_list.append(symbol_info['symbols'][0])
+                        print(f"Found information for {symbol}")
+                    else:
+                        print(f"No information found for {symbol}")
+                except Exception as e:
+                    print(f"Error fetching information for {symbol}: {e}")
+        
+        # Proceed with database insertion if we have symbol data
+        if not symbol_data_list:
+            print("No symbols to insert")
+            return 0
+        
         self._ensure_db_connection()
         
         with self.conn:
@@ -184,6 +233,9 @@ class Chronos:
         # Update cache for each inserted symbol
         for data in symbol_data_list:
             self.symbol_cache[data['symbol']] = data
+        
+        print(f"Successfully inserted {len(symbol_data_list)} symbols")
+        return len(symbol_data_list)
     
     def update_stale_symbols(self, days_threshold=90):
         """Update symbols that haven't been refreshed in the specified number of days"""
@@ -671,7 +723,108 @@ class Chronos:
         finally:
             conn.close()
     
+    def get_all_market_data(self, as_dataframe=True):
+        """
+        Retrieves all available market data (candles) from the local database.
+        
+        Args:
+            as_dataframe (bool): If True, returns results as pandas DataFrame
+                                If False, returns results as a dictionary
+        
+        Returns:
+            pandas.DataFrame or dict: All candle data sorted by symbol and start time,
+                                     or a dictionary with 'candles' key if as_dataframe=False
+        """
+        import pandas as pd
+        
+        # Set up market data db path
+        market_db_path = self.project_root / "data" / "market_data.db"
+        
+        # Check if database file exists
+        if not market_db_path.exists():
+            print(f"Database file not found at {market_db_path}")
+            return pd.DataFrame() if as_dataframe else {"candles": []}
+        
+        # Connect to the database
+        conn = sqlite3.connect(str(market_db_path))
+        cursor = conn.cursor()
+        
+        # Check if the table exists
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='candles'")
+        if not cursor.fetchone():
+            print("Candles table does not exist in the database")
+            conn.close()
+            return pd.DataFrame() if as_dataframe else {"candles": []}
+        
+        try:
+            # Retrieve all candles sorted by symbol and start time
+            cursor.execute("""
+                SELECT * FROM candles
+                ORDER BY symbol, start
+            """)
+            
+            columns = [description[0] for description in cursor.description]
+            all_candles_data = cursor.fetchall()
+            
+            if as_dataframe:
+                # Convert to pandas DataFrame
+                df = pd.DataFrame(all_candles_data, columns=columns)
+                
+                # Convert date columns to datetime if DataFrame is not empty
+                if not df.empty:
+                    for date_col in ['start', 'end']:
+                        if date_col in df.columns:
+                            try:
+                                # First convert to datetime with UTC=True to handle timezone info
+                                dt_series = pd.to_datetime(df[date_col], utc=True)
+                                
+                                # Then ensure it's properly converted to datetime64[ns] without timezone info
+                                # This is a two-step process to ensure compatibility with TimeSeriesDataFrame
+                                df[date_col] = dt_series.dt.tz_localize(None)
+                                
+                                # Debug information
+                                print(f"Converted {date_col} column to dtype: {df[date_col].dtype}")
+                            except Exception as e:
+                                print(f"Error converting {date_col}: {e}")
+                                # If conversion fails, try a more aggressive approach
+                                try:
+                                    # For problematic entries, try converting each string individually
+                                    # and handle timezone info explicitly
+                                    temp_dates = []
+                                    for dt_str in df[date_col]:
+                                        try:
+                                            dt = pd.Timestamp(dt_str).tz_convert('UTC').tz_localize(None)
+                                            temp_dates.append(dt)
+                                        except:
+                                            # If conversion fails, use NaT
+                                            temp_dates.append(pd.NaT)
+                                    
+                                    df[date_col] = pd.Series(temp_dates)
+                                    print(f"Alternative conversion for {date_col} resulted in dtype: {df[date_col].dtype}")
+                                except Exception as inner_e:
+                                    print(f"Alternative conversion also failed: {inner_e}")
+                
+                print(f"Retrieved {len(df)} total candles across all symbols")
+                return df
+            else:
+                # Convert to dictionary format
+                all_candles = []
+                for row in all_candles_data:
+                    candle_dict = {columns[i]: row[i] for i in range(len(columns))}
+                    all_candles.append(candle_dict)
+                
+                print(f"Retrieved {len(all_candles)} total candles across all symbols")
+                return {"candles": all_candles}
+        
+        except sqlite3.Error as e:
+            print(f"Database error: {e}")
+            return pd.DataFrame() if as_dataframe else {"candles": []}
+        finally:
+            conn.close()
+
     def __del__(self):
         """Ensure database connection is closed when object is destroyed"""
         if hasattr(self, 'conn') and self.conn is not None:
             self.conn.close()
+
+    
