@@ -200,6 +200,8 @@ class QuestradeAPI:
         self.refresh_token = response_json['refresh_token']
         
         # Save the new refresh token
+        # Create directory if it doesn't exist
+        os.makedirs(os.path.dirname(self.token_path), exist_ok=True)
         with open(self.token_path, 'w') as f:
             json.dump({'refresh_token': self.refresh_token}, f)
         
