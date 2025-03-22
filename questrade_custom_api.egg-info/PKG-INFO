@@ -1,3 +1,27 @@
+Metadata-Version: 2.1
+Name: questrade-custom-api
+Version: 0.1.0
+Summary: A custom wrapper for the Questrade API
+Home-page: https://github.com/yourusername/QuestradeCustomAPIWrapper
+Author: Questrade API Wrapper Developer
+Author-email: example@example.com
+Keywords: questrade,api,trading,finance
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Financial and Insurance Industry
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Topic :: Office/Business :: Financial :: Investment
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: requests
+Requires-Dist: typing; python_version < "3.5"
+
 # Questrade Custom API Wrapper
 
 A comprehensive Python wrapper for the Questrade API, providing easy access to account information and market data.

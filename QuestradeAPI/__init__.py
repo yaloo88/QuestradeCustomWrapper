@@ -15,6 +15,7 @@ from .CustomWrapper import (
 
 from .RateLimiter import RateLimiter, ApiCategory
 from .enums import *
+from .Chronos import Chronos
 
 __all__ = [
     'QuestradeAPI',
@@ -23,5 +24,6 @@ __all__ = [
     'QuestradeOrderError',
     'QuestradeRateLimitError',
     'RateLimiter',
-    'ApiCategory'
+    'ApiCategory',
+    'Chronos'
 ] 

@@ -4,7 +4,7 @@ Basic usage example for the Questrade Custom API Wrapper
 """
 
 import os
-from questrade_custom_api import QuestradeAPI
+from QuestradeAPI import QuestradeAPI
 
 def main():
     """
