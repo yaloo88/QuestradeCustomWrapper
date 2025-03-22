@@ -73,6 +73,42 @@ class QuestradeRateLimitError(QuestradeGeneralError):
             self.__str__ = lambda: f"Questrade Rate Limit Error {code}: {message} (Retry after: {retry_after}s)"
 
 
+def retry_with_new_token(method):
+    """
+    Decorator that will retry the method with a fresh token if the initial attempt fails with an authentication error.
+    """
+    def wrapper(self, *args, **kwargs):
+        max_retries = 1  # Only try refreshing once to avoid infinite loops
+        retry_count = 0
+        
+        while retry_count <= max_retries:
+            try:
+                # Try the original method
+                return method(self, *args, **kwargs)
+            except QuestradeGeneralError as e:
+                # Check if it's an authentication error
+                if e.status_code == 401 or "Access token is invalid" in e.message:
+                    if retry_count < max_retries:
+                        # Re-initialize the API connection
+                        print("API token expired. Refreshing token and retrying...")
+                        if self.authenticate():
+                            retry_count += 1
+                            continue  # Try again with the new token
+                        else:
+                            print("Failed to refresh API token. You may need to provide a new refresh token.")
+                            raise QuestradeGeneralError("1018", "Failed to refresh authentication token", 401)
+                    else:
+                        # We've already retried once, so fail permanently
+                        raise QuestradeGeneralError("1019", "Authentication failed after retry", 401)
+                else:
+                    # Not an authentication error, re-raise
+                    raise
+            
+            retry_count += 1  # Should never reach here, but just in case
+
+    return wrapper
+
+
 class QuestradeAPI:
     """
     A custom wrapper for the Questrade API that handles authentication and provides
@@ -144,6 +180,14 @@ class QuestradeAPI:
         
         if response.status_code != 200:
             print(f"Authentication failed: {response.text}")
+            # Clear the invalid refresh token so user will be prompted on next attempt
+            self.refresh_token = None
+            if os.path.exists(self.token_path):
+                try:
+                    os.remove(self.token_path)
+                    print("Removed invalid token file. Please provide a new refresh token.")
+                except:
+                    pass
             return False
             
         response_json = response.json()
@@ -155,13 +199,9 @@ class QuestradeAPI:
         self.expires_in = response_json['expires_in']
         self.refresh_token = response_json['refresh_token']
         
-        # Save response to json file
-        try:
-            os.makedirs(os.path.dirname(self.token_path), exist_ok=True)
-            with open(self.token_path, 'w') as f:
-                json.dump(response_json, f, indent=4)
-        except PermissionError:
-            print("Permission denied when trying to save token file. Try running with admin privileges or saving to a different location.")
+        # Save the new refresh token
+        with open(self.token_path, 'w') as f:
+            json.dump({'refresh_token': self.refresh_token}, f)
         
         return True
     
@@ -186,6 +226,7 @@ class QuestradeAPI:
                 # If we can't parse the headers, just ignore them
                 pass
     
+    @retry_with_new_token
     def _make_request(self, endpoint: str, method: str = 'GET', params: Optional[Dict] = None, 
                      data: Optional[Dict] = None, retry_count: int = 0) -> Dict:
         """
@@ -861,7 +902,7 @@ class QuestradeAPI:
                     currency (str): Currency code (ISO format)
                     minTicks (List[Dict]): List of minimum tick data
                     industrySector (str): Industry sector classification
-                    industryGroup (str): Industry group classification 
+                    industryGroup (str): Industry group classification
                     industrySubGroup (str): Industry subgroup classification
         """
         return self._make_request(f'v1/symbols/{symbol_id}')

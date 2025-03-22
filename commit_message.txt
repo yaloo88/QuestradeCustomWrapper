@@ -1,0 +1,23 @@
+Fix Chronos database schema and datetime handling
+
+This commit addresses two critical issues in the Chronos data caching component:
+
+1. Database Schema Fix:
+   - Added missing 'interval' column to the candles table in market_data.db
+   - Updated the primary key to include (symbol, start, interval)
+   - This allows different time intervals (OneMinute, OneDay, etc.) for the
+     same symbol and timestamp to coexist in the database
+
+2. Datetime Handling Fix:
+   - Resolved timezone comparison issues in the get_candles method
+   - Added proper handling for timezone-aware and timezone-naive datetime objects
+   - Improved error handling for datetime parsing
+
+Additional changes:
+- Added example fix scripts in examples/bugfixes directory with documentation
+- Updated README.md with information about the fixes
+- Added .gitignore to exclude database files
+- Added data/.gitkeep to ensure the data directory is tracked in git
+
+These fixes ensure all Chronos methods work correctly for different time intervals
+and prevent datetime-related errors when retrieving historical candle data. 
