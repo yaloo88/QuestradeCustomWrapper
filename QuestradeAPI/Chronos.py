@@ -427,7 +427,7 @@ class Chronos:
         
         # Retrieve all candles for the symbol and interval from the database
         cursor.execute("""
-            SELECT start, end, low, high, open, close, volume, VWAP
+            SELECT symbol, start, end, low, high, open, close, volume, VWAP
             FROM candles
             WHERE symbol = ? AND interval = ?
             ORDER BY start
@@ -446,7 +446,7 @@ class Chronos:
         if not df.empty:
             for date_col in ['start', 'end']:
                 if date_col in df.columns:
-                    df[date_col] = pd.to_datetime(df[date_col])
+                    df[date_col] = pd.to_datetime(df[date_col], utc=True)
             
         print(f"Retrieved {len(df)} candles for {symbol}")
         return df
@@ -584,8 +584,7 @@ class Chronos:
         all_candles = []
         for row in all_candles_data:
             candle_dict = {columns[i]: row[i] for i in range(len(columns))}
-            # Remove symbol and interval from individual candle dict as they're redundant
-            candle_dict.pop('symbol', None)
+            # Only remove interval as it's the same for all rows
             candle_dict.pop('interval', None)
             all_candles.append(candle_dict)
         
@@ -598,7 +597,7 @@ class Chronos:
             if not df.empty:
                 for date_col in ['start', 'end']:
                     if date_col in df.columns:
-                        df[date_col] = pd.to_datetime(df[date_col])
+                        df[date_col] = pd.to_datetime(df[date_col], utc=True)
             return df
         
         # Otherwise return in original dict format
@@ -661,8 +660,7 @@ class Chronos:
             candles = []
             for row in candles_data:
                 candle_dict = {columns[i]: row[i] for i in range(len(columns))}
-                # Remove symbol and interval from individual candle dict as they're redundant
-                candle_dict.pop('symbol', None)
+                # Only remove interval as it's the same for all rows
                 candle_dict.pop('interval', None)
                 candles.append(candle_dict)
             
