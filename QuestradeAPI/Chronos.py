@@ -451,17 +451,18 @@ class Chronos:
         print(f"Retrieved {len(df)} candles for {symbol}")
         return df
     
-    def get_updated_candles(self, symbol, interval="OneMinute"):
+    def get_updated_candles(self, symbol, interval="OneMinute", as_dataframe=False):
         """
         Get updated candles for a symbol, fetching only new data if existing data is found.
-        This returns data in the API format with a 'candles' key.
         
         Args:
             symbol (str): The stock symbol to get candles for
             interval (str): Candle interval ("OneMinute", "OneDay", etc.)
+            as_dataframe (bool): If True, returns results as pandas DataFrame instead of dict
         
         Returns:
-            dict: Dictionary with 'candles' key containing list of candle dictionaries
+            dict or pandas.DataFrame: Dictionary with 'candles' key containing list of candle dictionaries,
+                                    or a pandas DataFrame if as_dataframe=True
         """
         import os
         import pandas as pd
@@ -590,6 +591,17 @@ class Chronos:
         
         conn.close()
         
+        # Return as DataFrame if requested
+        if as_dataframe:
+            df = pd.DataFrame(all_candles)
+            # Convert date columns to datetime if DataFrame is not empty
+            if not df.empty:
+                for date_col in ['start', 'end']:
+                    if date_col in df.columns:
+                        df[date_col] = pd.to_datetime(df[date_col])
+            return df
+        
+        # Otherwise return in original dict format
         return {"candles": all_candles}
     
     def search_candles_from_db(self, symbol, start_date=None, end_date=None, interval='OneMinute'):
